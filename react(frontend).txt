@@ -1,0 +1,5 @@
+React (Frontend):
+npx create-react-app customer-app
+cd customer-app
+npm install axios
+

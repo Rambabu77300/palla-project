@@ -1,0 +1,18 @@
+PostgreSQL:
+
+CREATE TABLE customers (
+  sno SERIAL PRIMARY KEY,
+  customer_name VARCHAR(255),
+  age INT,
+  phone VARCHAR(20),
+  location VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+insert dummy data into table:
+INSERT INTO customers (customer_name, age, phone, location) VALUES
+('John Doe', 25, '1234567890', 'New York'),
+('Jane Doe', 30, '9876543210', 'Los Angeles'),
+-- Add 48 more records here
+;

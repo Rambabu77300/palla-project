@@ -1,0 +1,94 @@
+Replace the content of src/App.js:
+
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+const App = () => {
+  const [customers, setCustomers] = useState([]);
+  const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('created_at');
+  const [pageNumber, setPageNumber] = useState(1);
+  const customersPerPage = 20;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`/api/customers`);
+        setCustomers(response.data);
+      } catch (error) {
+        console.error('Error fetching data', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const filteredCustomers = customers.filter(
+    (customer) =>
+      customer.customer_name.toLowerCase().includes(search.toLowerCase()) ||
+      customer.location.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const sortedCustomers = filteredCustomers.sort((a, b) => {
+    if (sortBy === 'date') {
+      return new Date(b.created_at) - new Date(a.created_at);
+    } else if (sortBy === 'time') {
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    } else {
+      return 0;
+    }
+  });
+
+  const paginatedCustomers = sortedCustomers.slice(
+    (pageNumber - 1) * customersPerPage,
+    pageNumber * customersPerPage
+  );
+
+  return (
+    <div>
+      <input
+        type="text"
+        placeholder="Search by name or location"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+      <select onChange={(e) => setSortBy(e.target.value)}>
+        <option value="created_at">Sort by Date</option>
+        <option value="time">Sort by Time</option>
+      </select>
+      <table>
+        <thead>
+          <tr>
+            <th>S.No</th>
+            <th>Customer Name</th>
+            <th>Age</th>
+            <th>Phone</th>
+            <th>Location</th>
+            <th>Date</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {paginatedCustomers.map((customer) => (
+            <tr key={customer.sno}>
+              <td>{customer.sno}</td>
+              <td>{customer.customer_name}</td>
+              <td>{customer.age}</td>
+              <td>{customer.phone}</td>
+              <td>{customer.location}</td>
+              <td>{new Date(customer.created_at).toLocaleDateString()}</td>
+              <td>{new Date(customer.created_at).toLocaleTimeString()}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div>
+        <button onClick={() => setPageNumber((prev) => Math.max(prev - 1, 1))}>Previous</button>
+        <span>{pageNumber}</span>
+        <button onClick={() => setPageNumber((prev) => prev + 1)}>Next</button>
+      </div>
+    </div>
+  );
+};
+
+export default App;
